@@ -1,18 +1,21 @@
 package elect;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.net.MalformedURLException;
+import java.net.URL;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
 
 @XmlRootElement(name = "escrutinio_sitio")
-
-//@XmlRootElement(name = "bibliotecas", namespace = "biblios")
-//@XmlType(propOrder = {"num_a_elegir","nombre_lugar","nombre_diputado","porciento_escrutado","nombre_sitio","convocatoria","ts","tipo_sitio","lista_votos","lista_resultados"})
-
 public class Escrutinio_sitio implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -159,6 +162,82 @@ public class Escrutinio_sitio implements Serializable {
 	public void setlista_resultados(Resultados plista_resultados) {
 
 		lista_resultados = plista_resultados;
+	}
+	
+	public String Buscar_por_nombre(String nombre) {
+		String coincidencias = "";
+		int contador = 0;
+
+		for (contador = 0; contador < getlista_resultados().getpartidos().size(); contador++) {
+			if (getlista_resultados().getpartidos().get(contador).getnombre().contains(nombre)) {
+				coincidencias = coincidencias + getlista_resultados().getpartidos().get(contador);
+			}
+		}
+
+		if (coincidencias.length() > 0) {
+			coincidencias = "\n Se han encontrado resultados con el nombre " + nombre + " que son \n" + coincidencias;
+		} else {
+			coincidencias = "\n No se han encontrado resultados con el nombre " + nombre + "\n";
+		}
+		return coincidencias;
+	}
+	
+	public String ver_informacion() {
+		String respuesta = "";
+		respuesta = respuesta + "El numero a elegir es " + getnum_a_elegir() + "\n";
+		respuesta = respuesta + "El nombre del lugar es " + getnombre_lugar() + "\n";
+		respuesta = respuesta + "El nombre del diputado es " + getnombre_diputado() + "\n";
+		respuesta = respuesta + "Hay un " + getporciento_escrutado() + " por ciento escrutado\n";
+		respuesta = respuesta + "El nombre del sitio es " + getnombre_sitio() + "\n";
+		respuesta = respuesta + "La convocatoria es el anyo " + getconvocatoria() + "\n";
+		respuesta = respuesta + "El ts es " + getts() + "\n";
+		respuesta = respuesta + "El tipo de sitio es " + gettipo_sitio() + "\n";
+		respuesta = respuesta + "La lista de votos es " + "\n";
+		respuesta = respuesta + getlista_votos() + "\n";
+		return respuesta;
+	}
+
+	public String Buscar_por_id(String id_a_buscar) {
+
+		String coincidencias = "";
+		int contador = 0;
+
+		for (contador = 0; contador < getlista_resultados().getpartidos().size(); contador++) {
+			if (getlista_resultados().getpartidos().get(contador).getid_partido() == Integer
+					.parseInt(id_a_buscar)) {
+				coincidencias = coincidencias + getlista_resultados().getpartidos().get(contador);
+			}
+		}
+
+		if (coincidencias.length() > 0) {
+			coincidencias = "\n Se han encontrado resultados con la id " + id_a_buscar + " que son \n" + coincidencias;
+		} else {
+			coincidencias = "\n No se han encontrado resultados con la id " + id_a_buscar;
+		}
+		return coincidencias;
+	}
+	
+	public Escrutinio_sitio Cargar_xml(String parametro)
+			throws JAXBException, IOException, MalformedURLException, Exception, FileNotFoundException {
+
+		Escrutinio_sitio escrutinio = new Escrutinio_sitio();
+		JAXBContext context = JAXBContext.newInstance(escrutinio.getClass());
+		Unmarshaller um = context.createUnmarshaller();
+		escrutinio = new Escrutinio_sitio((Escrutinio_sitio) um.unmarshal(new FileReader(new File(parametro))));
+
+		return escrutinio;
+	}
+	
+	public Escrutinio_sitio Pasar_pagina_web_a_archivo(String parametro)
+			throws JAXBException, IOException, MalformedURLException, Exception, FileNotFoundException {
+		
+		URL url = new URL(parametro);
+		Escrutinio_sitio escrutinio = new Escrutinio_sitio();
+		JAXBContext context = JAXBContext.newInstance(escrutinio.getClass());
+		Unmarshaller um = context.createUnmarshaller();
+		escrutinio = new Escrutinio_sitio((Escrutinio_sitio) um.unmarshal(new InputStreamReader(url.openStream())));
+
+		return escrutinio;
 	}
 
 	public String toString() {
