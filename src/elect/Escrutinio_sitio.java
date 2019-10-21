@@ -169,7 +169,7 @@ public class Escrutinio_sitio implements Serializable {
 		int contador = 0;
 
 		for (contador = 0; contador < getlista_resultados().getpartidos().size(); contador++) {
-			if (getlista_resultados().getpartidos().get(contador).getnombre().contains(nombre)) {
+			if (getlista_resultados().getpartidos().get(contador).getnombre().equals(nombre)) {
 				coincidencias = coincidencias + getlista_resultados().getpartidos().get(contador);
 			}
 		}
